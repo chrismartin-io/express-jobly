@@ -21,5 +21,3 @@ describe("Testing SQL partial update function", function () {
     });
   });
 });
-
-
