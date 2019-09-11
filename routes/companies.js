@@ -3,20 +3,29 @@ const Company = require("../models/company");
 const ExpressError = require('../helpers/expressError');
 const router = new express.Router();
 const db = require("../db");
-const getCompanies = require('../helpers/getCompanies')
 
 
 router.get('/', async function (req, res, next) {
   try {
 
-    let result = await getCompanies(req);
+    let result = await Company.getCompanies(req);
     return res.json({
       companies: result
     });
   } catch (err) {
     return next(err);
   }
-})
+});
+
+router.post('/', async function (req, res, next) {
+  try {
+
+    let company = await Company.create(req);
+    return res.json({ company });
+  } catch (err) {
+    return next(err);
+  }
+});
 
 
 
