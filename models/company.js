@@ -64,7 +64,7 @@ class Company {
   };
 
   // db with min and max.
-  static async minOrMax(minVal, maxVal) {
+  static async minAndMax(minVal, maxVal) {
     const result = await db.query(`
     SELECT handle, name
     FROM companies
@@ -101,7 +101,7 @@ class Company {
 
 
 
-
+  
 
   static async getCompanies(req) {
 
@@ -127,7 +127,7 @@ class Company {
     }
     // If min and 'max search' are in query we will search by employee number
     else if (req.query.min_employees && req.query.max_employees) {
-      const result = await Company.minOrMax(req.query.min_employees, req.query.max_employees);
+      const result = await Company.minAndMax(req.query.min_employees, req.query.max_employees);
       return result;
     }
     // search if 'search' query is present

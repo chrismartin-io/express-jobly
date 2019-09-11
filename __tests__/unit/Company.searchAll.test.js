@@ -36,28 +36,43 @@ describe("Testing the search all function", function () {
   test("Can we get company by name", async function () {
     const response = await Company.searchAll('MichellSoft', 200, 300);
 
-    expect(response).toEqual([{ handle: c2.handle, name: c2.name }]);
+    expect(response).toEqual([{
+      handle: c2.handle,
+      name: c2.name
+    }]);
   });
 
   test("Can we get company by partial name", async function () {
     const response = await Company.searchAll('Mic', 0, 6000);
 
-    expect(response).toEqual([{ handle: c1.handle, name: c1.name }, { handle: c2.handle, name: c2.name }])
+    expect(response).toEqual([{
+      handle: c1.handle,
+      name: c1.name
+    }, {
+      handle: c2.handle,
+      name: c2.name
+    }])
     expect(response.length).toEqual(2);
   });
 
   test("Can get company by handle", async function () {
     const response = await Company.searchAll('MLS', 200, 300);
 
-    expect(response).toEqual([{ handle: c2.handle, name: c2.name }]);
+    expect(response).toEqual([{
+      handle: c2.handle,
+      name: c2.name
+    }]);
     expect(response.length).toEqual(1);
   });
 
-  test("Can we search by min_employees and max_employees", async function(){
+  test("Can we search by min_employees and max_employees", async function () {
     const response = await Company.searchAll('Mic', 300, 6000);
     const noresponse = await Company.searchAll('Mic', 300, 1000);
-    
-    expect(response).toEqual([{ handle: c1.handle, name: c1.name }]);
+
+    expect(response).toEqual([{
+      handle: c1.handle,
+      name: c1.name
+    }]);
     expect(response.length).toEqual(1);
 
     expect(noresponse).toEqual([]);
@@ -69,5 +84,4 @@ describe("Testing the search all function", function () {
 
 afterAll(async function () {
   await db.end();
-
 });
