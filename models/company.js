@@ -48,7 +48,7 @@ class Company {
 
   // get company by handle
 
-  static async getHandle(handle) {
+  static async getByHandle(handle) {
     const result = await db.query(
       `SELECT *
       FROM companies
@@ -60,7 +60,7 @@ class Company {
   }
 
   // update company by handle
-  static async updateHandle(req, handle) {
+  static async updateByHandle(req, handle) {
     const queryObj = partialUpdate("companies", req.body, "handle", handle);
     const result = await db.query(queryObj.query, queryObj.values);
 
