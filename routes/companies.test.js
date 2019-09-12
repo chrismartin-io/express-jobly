@@ -55,8 +55,37 @@ describe('test post /companies route', function () {
     });
 
     const newResponse = await request(app).get('/companies');
-    console.log(newResponse.body)
     expect(Object.keys(newResponse.body.companies).length).toEqual(2);
+  });
+});
+
+describe('get /companies/:handle route', function () {
+  test("Can we get a company by the handle", async function () {
+    const response = await request(app).get(`/companies/${c1.handle}`);
+
+    expect(response.body).toEqual({ company: { ...c1 } })
+  });
+
+  test("Do we get a 404 if we put in the wrong handle", async function () {
+    const response = await request(app).get(`/companies/00000`);
+
+    expect(response.statusCode).toEqual(404);
+  });
+
+});
+
+describe('patch /companies/:handle route', function () {
+  test("Can we update a company by the handle", async function () {
+    const response = await request(app).patch(`/companies/${c1.handle}`).send(c2);
+
+    expect(response.statusCode).toEqual(200);
+    expect(response.body).toEqual({ company: { ...c2 } });
+  });
+
+  test("Do we get a 404 when trying to change a handle that doesn't exist", async function () {
+    const response = await request(app).patch(`/companies/${c2.handle}`).send(c2);
+
+    expect(response.statusCode).toEqual(404);
   });
 });
 

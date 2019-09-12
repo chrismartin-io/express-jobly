@@ -2,6 +2,7 @@
 
 const db = require("../db");
 const ExpressError = require("../helpers/expressError");
+const partialUpdate = require("../helpers/partialUpdate");
 
 class Company {
 
@@ -45,9 +46,30 @@ class Company {
     const result = await db.query(
       `SELECT handle, name 
       FROM companies`
-    )
+    );
+
     return result.rows;
   }
+
+// get company by handle
+  static async getHandle(handle){
+    const result = await db.query(
+      `SELECT *
+      FROM companies
+      WHERE handle = $1`,
+      [handle]
+    );
+    
+    return result.rows[0];
+  }
+
+// update company by handle
+static async updateHandle(req, handle){
+  const queryObj = partialUpdate("companies", req.body, "handle", handle);
+  const result =  await db.query(queryObj.query,queryObj.values);
+
+  return result.rows[0];
+};
 
   // search query with a min or max value
   static async searchMinOrMax(search, value, operator) {

@@ -27,6 +27,32 @@ router.post('/', async function (req, res, next) {
   }
 });
 
+router.get('/:handle', async function(req, res, next) {
+  try {
+
+  let company = await Company.getHandle(req.params.handle);
+  if (!company){
+    throw new ExpressError("Company not found", 404);
+  }
+  return res.json({ company });
+  } catch (err){
+    return next(err);
+  };
+});
+
+router.patch('/:handle', async function(req, res, next){
+  try {
+
+    let handle = req.params.handle;
+    let company = await Company.updateHandle(req, handle);
+    if (!company){
+      throw new ExpressError("Company not found", 404);
+    };
+    return res.json({ company });
+  } catch (err) {
+    return next(err);
+  }
+})
 
 
 module.exports = router;
