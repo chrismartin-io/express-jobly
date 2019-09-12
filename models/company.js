@@ -1,11 +1,9 @@
 // Company class 
 
 const db = require("../db");
-const ExpressError = require("../helpers/expressError");
 const partialUpdate = require("../helpers/partialUpdate");
 
 class Company {
-
 
   // search with min and max
 
@@ -18,23 +16,20 @@ class Company {
       AND (handle || name) LIKE $1`,
       [`%${search}%`, min, max]);
 
-
-      
     return result.rows;
   }
 
-  static async create(req){
-    const handle = req.body.handle;
-    const name = req.body.name;
-    const num_employees =  req.body.num_employees;
-    const description = req.body.description
-    const logo_url = req.body.logo_url;
+  // create company 
+
+  static async create(req) {
+
+    const { handle, name, num_employees, description, logo_url } = req;
 
     const result = await db.query(`
     INSERT INTO companies (handle, name, num_employees, description, logo_url)
     VALUES ($1, $2, $3, $4, $5)
     RETURNING handle, name, num_employees, description, logo_url`,
-    [handle, name, num_employees, description, logo_url]);
+      [handle, name, num_employees, description, logo_url]);
 
     return result.rows[0];
   };
@@ -51,25 +46,26 @@ class Company {
     return result.rows;
   }
 
-// get company by handle
-  static async getHandle(handle){
+  // get company by handle
+
+  static async getHandle(handle) {
     const result = await db.query(
       `SELECT *
       FROM companies
       WHERE handle = $1`,
       [handle]
     );
-    
+
     return result.rows[0];
   }
 
-// update company by handle
-static async updateHandle(req, handle){
-  const queryObj = partialUpdate("companies", req.body, "handle", handle);
-  const result =  await db.query(queryObj.query,queryObj.values);
+  // update company by handle
+  static async updateHandle(req, handle) {
+    const queryObj = partialUpdate("companies", req.body, "handle", handle);
+    const result = await db.query(queryObj.query, queryObj.values);
 
-  return result.rows[0];
-};
+    return result.rows[0];
+  };
 
   // search query with a min or max value
   static async searchMinOrMax(search, value, operator) {
@@ -123,48 +119,48 @@ static async updateHandle(req, handle){
 
 
 
-  
+
 
   static async getCompanies(req) {
 
     // If we have all three query params we will search for all of them
-    if (req.query.search && req.query.min_employees &&
-      req.query.max_employees) {
-      const result = await Company.searchAll(req.query.search,
-        req.query.min_employees, req.query.max_employees);
+    if (req.search && req.min_employees &&
+      req.max_employees) {
+      const result = await Company.searchAll(req.search,
+        req.min_employees, req.max_employees);
       return result;
 
     }
     // If 'search' and 'min' are in the query we will search for 'min employees'
-    else if (req.query.search && req.query.min_employees) {
-      const result = await Company.searchMinOrMax(req.query.search, req.query.min_employees, `>=`);
+    else if (req.search && req.min_employees) {
+      const result = await Company.searchMinOrMax(req.search, req.min_employees, `>=`);
       return result;
 
     }
     // If 'search' and 'max' are in query we will search for 'max employees'
-    else if (req.query.search && req.query.max_employees) {
-      const result = await Company.searchMinOrMax(req.query.search, req.query.max_employees, `<=`);
+    else if (req.search && req.max_employees) {
+      const result = await Company.searchMinOrMax(req.search, req.max_employees, `<=`);
       return result;
 
     }
     // If min and 'max search' are in query we will search by employee number
-    else if (req.query.min_employees && req.query.max_employees) {
-      const result = await Company.minAndMax(req.query.min_employees, req.query.max_employees);
+    else if (req.min_employees && req.max_employees) {
+      const result = await Company.minAndMax(req.min_employees, req.max_employees);
       return result;
     }
     // search if 'search' query is present
-    else if (req.query.search) {
-      const result = await Company.search(req.query.search);
+    else if (req.search) {
+      const result = await Company.search(req.search);
       return result;
     }
     //search if 'min employees' is present
-    else if (req.query.min_employees) {
-      const result = await Company.singleMinOrMax(req.query.min_employees, `>=`);
+    else if (req.min_employees) {
+      const result = await Company.singleMinOrMax(req.min_employees, `>=`);
       return result;
     }
     //search if 'max employees' is present
-    else if (req.query.max_employees) {
-      const result = await Company.singleMinOrMax(req.query.max_employees, `<=`);
+    else if (req.max_employees) {
+      const result = await Company.singleMinOrMax(req.max_employees, `<=`);
       return result;
     }
     // else return all of the companies

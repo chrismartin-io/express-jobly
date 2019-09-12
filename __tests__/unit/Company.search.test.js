@@ -8,27 +8,23 @@ let c2;
 
 describe("Testing the search function", function () {
   beforeEach(async function () {
-    await db.query(`DELETE FROM companies`)
+    await db.query(`TRUNCATE companies`)
     c1 = {
-      body: {
         handle: "M32",
         name: "Mic3elSoft2",
         description: "Like MS paint for some reason.",
         logo_url: "http://wesoscary.org",
         num_employees: 5000
       }
-    };
     c1 = await Company.create(c1);
 
     c2 = {
-      body: {
         handle: "MLS",
         name: "MichellSoft",
         description: "The mean one",
         logo_url: "http://wesoscary.org",
         num_employees: 230
       }
-    };
     c2 = await Company.create(c2);
 
   });

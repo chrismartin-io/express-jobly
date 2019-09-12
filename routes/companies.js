@@ -2,57 +2,92 @@ const express = require("express");
 const Company = require("../models/company");
 const ExpressError = require('../helpers/expressError');
 const router = new express.Router();
-const db = require("../db");
+const jsonschema = require("jsonschema");
+const companiesCreateSchema = require("../schemas/companiesCreateSchema");
+const companiesPatchSchema = require("../schemas/companiesPatchSchema")
 
 
+// Router get all companies
 router.get('/', async function (req, res, next) {
   try {
 
-    let result = await Company.getCompanies(req);
+    let companies = await Company.getCompanies(req.body);
     return res.json({
-      companies: result
+      companies
     });
   } catch (err) {
     return next(err);
   }
 });
 
-router.post('/', async function (req, res, next) {
-  try {
 
-    let company = await Company.create(req);
-    return res.json({ company });
+// Route post route
+router.post('/', async function (req, res, next) {
+
+  // JSON Schema
+  const resultValid = jsonschema.validate(req.body, companiesCreateSchema);
+
+  if (!resultValid.valid) {
+    let listOfErrors = resultValid.errors.map(error => error.stack);
+    let error = new ExpressError(listOfErrors, 400);
+    return next(error);
+  }
+
+  try {
+    let company = await Company.create(req.body);
+    return res.json({
+      company
+    });
   } catch (err) {
     return next(err);
   }
 });
 
-router.get('/:handle', async function(req, res, next) {
+
+// Router get specific 
+router.get('/:handle', async function (req, res, next) {
   try {
 
-  let company = await Company.getHandle(req.params.handle);
-  if (!company){
-    throw new ExpressError("Company not found", 404);
-  }
-  return res.json({ company });
-  } catch (err){
+    let company = await Company.getHandle(req.params.handle);
+    if (!company) {
+      throw new ExpressError("Company not found", 404);
+    }
+    return res.json({
+      company
+    });
+  } catch (err) {
     return next(err);
-  };
+  }
 });
 
-router.patch('/:handle', async function(req, res, next){
+
+// Router patch route
+router.patch('/:handle', async function (req, res, next) {
+
+  // JSON Schema
+
+  const resultValid = jsonschema.validate(req.body, companiesPatchSchema);
+
+  if (!resultValid.valid) {
+    let listOfErrors = resultValid.errors.map(error => error.stack);
+    let error = new ExpressError(listOfErrors, 400);
+    return next(error);
+  }
+
   try {
 
     let handle = req.params.handle;
     let company = await Company.updateHandle(req, handle);
-    if (!company){
+    if (!company) {
       throw new ExpressError("Company not found", 404);
     };
-    return res.json({ company });
+    return res.json({
+      company
+    });
   } catch (err) {
     return next(err);
   }
-})
+});
 
 
 module.exports = router;

@@ -11,14 +11,12 @@ let c2;
 beforeEach(async function () {
   await db.query(`DELETE FROM companies`)
   c1 = {
-    body: {
       handle: "M32",
       name: "Mic3elSoft2",
       description: "Like MS paint for some reason.",
       logo_url: "http://wesoscary.org",
       num_employees: 5000
     }
-  }
 
   c1 = await Company.create(c1);
 
@@ -48,6 +46,7 @@ describe('get /companies route', function () {
 describe('test post /companies route', function () {
   test("Can we post a company", async function () {
     const response = await request(app).post('/companies').send(c2);
+    console.log('C2 IS', c2);
     expect(response.body).toEqual({
       company: {
         ...c2
@@ -87,6 +86,14 @@ describe('patch /companies/:handle route', function () {
 
     expect(response.statusCode).toEqual(404);
   });
+
+  test("After patching do we get a 404", async function () {
+    const send = await request(app).patch(`/companies/${c1.handle}`).send(c2);
+    const response = await request(app).get(`/companies/${c1.handle}`);
+
+    expect(response.statusCode).toEqual(404);
+
+  })
 });
 
 
