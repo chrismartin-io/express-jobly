@@ -35,7 +35,16 @@ beforeEach(async function () {
     equity: 0.5,
     company_handle: "M32"
   }
+
+  j3 = {
+    title: "The best job ever 3.0",
+    salary: 48,
+    equity: 0.3,
+    company_handle: "M32"
+  }
+
   j2 = await Job.create(j2);
+  // j3 = await Job.create(j3);
 });
 
 describe("POST /jobs route", function () {
@@ -44,7 +53,13 @@ describe("POST /jobs route", function () {
     console.log(response.body);
 
     expect(response.statusCode).toEqual(200);
-    expect(response.body).toEqual({ job: { ...j1, date_posted: expect.any(String), id: response.body.job.id } });
+    expect(response.body).toEqual({
+      job: {
+        ...j1,
+        date_posted: expect.any(String),
+        id: response.body.job.id
+      }
+    });
   });
   test("Can we get an error if we leave out a key", async function () {
     const response = await request(app).post("/jobs/").send({
@@ -62,13 +77,22 @@ describe("POST /jobs route", function () {
     });
   });
 
+
   describe("GET /jobs route", async function () {
     test("Can we get all of the jobs", async function () {
       j1 = await Job.create(j1);
       const response = await request(app).get('/jobs/');
 
       expect(response.statusCode).toEqual(200);
-      expect(response.body).toEqual({ jobs: [{ title: j2.title, company_handle: j2.company_handle }, { title: j1.title, company_handle: j1.company_handle }] });
+      expect(response.body).toEqual({
+        jobs: [{
+          title: j2.title,
+          company_handle: j2.company_handle
+        }, {
+          title: j1.title,
+          company_handle: j1.company_handle
+        }]
+      });
 
     });
     test("Can search by title", async function () {
@@ -76,7 +100,12 @@ describe("POST /jobs route", function () {
       const response = await request(app).get(`/jobs/?search=2.0`);
 
       expect(response.statusCode).toEqual(200);
-      expect(response.body).toEqual({ jobs: [{ title: j2.title, company_handle: j2.company_handle }] });
+      expect(response.body).toEqual({
+        jobs: [{
+          title: j2.title,
+          company_handle: j2.company_handle
+        }]
+      });
 
     });
     test("Can we search by company handle", async function () {
@@ -84,36 +113,103 @@ describe("POST /jobs route", function () {
       const response = await request(app).get(`/jobs/?search=${j2.company_handle}`);
 
       expect(response.statusCode).toEqual(200);
-      expect(response.body).toEqual({ jobs: [{ title: j2.title, company_handle: j2.company_handle }, { title: j1.title, company_handle: j1.company_handle }] });
+      expect(response.body).toEqual({
+        jobs: [{
+          title: j2.title,
+          company_handle: j2.company_handle
+        }, {
+          title: j1.title,
+          company_handle: j1.company_handle
+        }]
+      });
     });
     test("Can we search by min_salary", async function () {
       j1 = await Job.create(j1);
       const response = await request(app).get(`/jobs/?min_salary=${j2.salary}`);
 
       expect(response.statusCode).toEqual(200);
-      expect(response.body).toEqual({ jobs: [{ title: j2.title, company_handle: j2.company_handle }] });
+      expect(response.body).toEqual({
+        jobs: [{
+          title: j2.title,
+          company_handle: j2.company_handle
+        }]
+      });
     });
     test("Can we search by max_salary", async function () {
       j1 = await Job.create(j1);
       const response = await request(app).get(`/jobs/?max_salary=${j2.salary - 1}`);
 
       expect(response.statusCode).toEqual(200);
-      expect(response.body).toEqual({ jobs: [{ title: j1.title, company_handle: j1.company_handle }] });
+      expect(response.body).toEqual({
+        jobs: [{
+          title: j1.title,
+          company_handle: j1.company_handle
+        }]
+      });
     });
     test("Can we search by all querys", async function () {
       j1 = await Job.create(j1);
       const response = await request(app).get(`/jobs/?min_salary=${j1.salary + 1}&search=M3&max_salary=${j2.salary}`);
 
       expect(response.statusCode).toEqual(200);
-      expect(response.body).toEqual({ jobs: [{ title: j2.title, company_handle: j2.company_handle }] });
+      expect(response.body).toEqual({
+        jobs: [{
+          title: j2.title,
+          company_handle: j2.company_handle
+        }]
+      });
     });
-    test("Can we get nothing", async function(){
+    test("Can we get nothing", async function () {
       j1 = await Job.create(j1);
       const response = await request(app).get(`/jobs/?min_salary=${j1.salary + 1}&search=M3&max_salary=${j2.salary-1}`);
 
       expect(response.statusCode).toEqual(200);
-      expect(response.body).toEqual({ jobs: [] });
+      expect(response.body).toEqual({
+        jobs: []
+      });
 
+    });
+
+  });
+
+  describe("GET job by ID", async function () {
+
+    // GET jobs by ID
+    test("Can we get a job by specifying id", async function () {
+      j1 = await Job.create(j1);
+      const response = await request(app).get(`/jobs/${j1.id}`);
+
+      expect(response.body).toEqual({
+        job: {
+          ...j1,
+          date_posted: expect.any(String)
+        }
+      });
+      expect(response.statusCode).toEqual(200);
+    })
+
+    test("Can we get nothing with the wrong id", async function () {
+      j1 = await Job.create(j1);
+      const response = await request(app).get(`/jobs/0`);
+
+      expect(response.body).toEqual({
+        status: 404,
+        message: "Job not found"
+      });
+    })
+  });
+
+  describe("DELETE job", async function() {
+
+    test("Can we delete a job", async function() {
+      j1 = await Job.create(j1);
+      const response = await request(app).delete(`/jobs/${j1.id}`);
+      const rowCount = await request(app).get('/jobs');
+
+      expect(response.body).toEqual({
+        message: "Job deleted"
+      });
+      expect(rowCount.body.jobs.length).toEqual(1);
     });
   });
 

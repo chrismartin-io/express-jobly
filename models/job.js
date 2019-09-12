@@ -46,6 +46,25 @@ class Job {
     return response.rows;
   };
 
+  static async getById(id) {
+
+    const result = await db.query(`
+    SELECT * FROM jobs
+    WHERE id = $1`, [id]);
+
+    return result.rows[0];
+  }
+
+  static async delete(id) {
+
+    const result = await db.query(`
+    DELETE from jobs
+    WHERE id = $1
+    RETURNING id`, [id]);
+
+    return result.rows[0];
+  }
+
 
 }
 

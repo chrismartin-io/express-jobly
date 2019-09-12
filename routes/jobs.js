@@ -19,21 +19,66 @@ router.post("/", async function (req, res, next) {
   try {
     const job = await Job.create(req.body);
 
-    return res.json({ job });
+    return res.json({
+      job
+    });
   } catch (err) {
     return next(err);
   }
 });
 
-router.get("/", async function(req, res, next){
+
+// get jobs with queries
+router.get("/", async function (req, res, next) {
 
   try {
     const jobs = await Job.get(req.query);
 
-    return res.json({ jobs });
+    return res.json({
+      jobs
+    });
   } catch (err) {
     return next(err);
   }
+});
+
+
+// get specific job
+router.get("/:id", async function (req, res, next) {
+  try {
+    const job = await Job.getById(req.params.id);
+
+    // If job cannot be found
+    if (!job) {
+      throw new ExpressError("Job not found", 404);
+    };
+    return res.json({
+      job
+    });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+
+// delete job
+router.delete("/:id", async function (req, res, next) {
+  try {
+    const job = await Job.delete(req.params.id);
+
+    // If job cannot be found
+    if (!job) {
+      throw new ExpressError("Job not found", 404);
+    }
+    return res.json({
+      message: "Job deleted"
+    });
+  }
+  catch (err) {
+    return next(err);
+  }
+
+  
 });
 
 
