@@ -4,7 +4,7 @@ const ExpressError = require('../helpers/expressError');
 const router = new express.Router();
 const jsonschema = require("jsonschema");
 const companiesCreateSchema = require("../schemas/companiesCreateSchema");
-const companiesPatchSchema = require("../schemas/companiesPatchSchema")
+const companiesPatchSchema = require("../schemas/companiesPatchSchema");
 
 
 // Router get all companies

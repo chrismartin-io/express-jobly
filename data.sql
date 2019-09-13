@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS jobs;
 DROP TABLE IF EXISTS companies;
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE companies (
   handle text PRIMARY KEY,
@@ -19,4 +20,14 @@ CREATE TABLE jobs (
   date_posted date DEFAULT CURRENT_DATE NOT NULL,
   CONSTRAINT equity_check
      CHECK(equity >= 0 AND equity <=1)
-)
+);
+
+CREATE TABLE users (
+  username text PRIMARY KEY,
+  password text NOT NULL,
+  first_name text NOT NULL,
+  last_name text NOT NULL,
+  email text NOT NULL,
+  photo_url text,
+  is_admin boolean DEFAULT FALSE
+);
