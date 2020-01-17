@@ -4,9 +4,9 @@
  
 Created by Jennifer and Chris
  
-Jobly backend is an express backend built for job hunting application. The development of the backend was unique as we jointly decided to do test driven development(TDD) for this project.
+Jobly backend is an express backend built for a job board. The project was built in Node, Express, and PostgreSQL. The development of the backend was unique as we jointly decided to do test driven development(TDD) for this project.
  
-We overcome our fear of tests and had a lot of fun. Due to this project requireing a change in the API call, `GET /companies/[handle]` from:
+We overcome our fear of tests and had a lot of fun. Due to this project requireing a change in the API call's response, `GET /companies/[handle]` from:
  
 ```
 {companies: [companyData, ...]}
